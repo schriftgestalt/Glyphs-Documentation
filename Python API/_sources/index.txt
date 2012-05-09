@@ -1,0 +1,1313 @@
+.. Glyphs documentation master file, created by
+   sphinx-quickstart on Sat Apr 17 17:11:16 2010.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+.. highlight:: python
+	:linenothreshold: 5
+
+.. _module:: Glyphs
+   :synopsis: The Glyphs.app Python Scripting API Documentation.
+
+.. moduleauthor:: Georg Seifert <info@schriftgestaltung.de>
+
+
+Glyphs.app Python Scripting API Documentation
+=============================================
+
+This is the documentation for the Python Scripting API for Glyphs.app (`glyphsapp.com <http://glyphsapp.com/>`_)
+
+Calling font objects starts with the mothership, the Glyphs object::
+
+	print Glyphs
+
+.. code-block:: python
+
+	<Glyphs.app>
+	
+The currently open fonts are attached to it::
+
+	# topmost open font
+	font = Glyphs.font
+	print font
+
+.. code-block:: python
+	
+	<GSFont "My Font" v1.0 with 2 masters and 5 instances>
+
+.. code-block:: python
+	
+	# all open fonts
+	fonts = Glyphs.fonts
+	print fonts
+
+.. code-block:: python
+	
+	[<GSFont "My Font" v1.0 with 2 masters and 5 instances>,
+	<GSFont "My Other Font" v1.0 with 1 masters and 1 instances>]
+
+.. image:: _static/objectmodel.png
+
+
+Constants
+=========
+
+GSMOVE = 17
+
+GSLINE = 1
+
+GSCURVE = 35
+
+GSOFFCURVE = 65
+
+GSSHARP = 0
+
+GSSMOOTH = 4096
+
+
+
+
+:mod:`GSFont`
+===============================================================================
+
+Implementation of the font object. This object is host to the :class:`Masters <GSFontMaster>` used for interpolation. Even when no interpolation is involved, for the sake of object model consistency there will still be one master and one instance representing a single font.
+
+Also, the :class:`Glyphs <GSGlyph>` are attached to the Font object right here, not one level down to the masters. The different master's glyphs are available as :class:`Layers <GSLayer>` attached to the :class:`Glyph <GSGlyph>` objects which are attached here.
+
+.. class:: GSFont
+
+**Properties**
+
+.. autosummary::
+
+	masters
+	instances
+	glyphs
+	classes
+	features
+	copyright
+	designer
+	designerURL
+	manufacturer
+	manufacturerURL
+	versionMajor
+	versionMinor
+	date
+	familyName
+	upm
+	note
+	kerning
+	userData
+	gridLength
+	disablesNiceNames
+
+
+**Functions**
+
+.. autosummary::
+
+	kerningForPair()
+	setKerningForPair()
+	removeKerningForPair()
+
+----------
+Properties
+----------
+
+
+
+.. attribute:: masters
+
+	Collection of :class:`GSFontMaster <GSFontMaster>`.
+
+	:type: list
+
+.. attribute:: instances
+
+	Collection of :class:`GSInstance <GSInstance>`.
+
+	:type: list
+
+.. attribute:: glyphs
+
+	Collection of :class:`GSGlyph <GSGlyph>`. Returns a list, but you may also call glyphs using index or glyph name as key.
+
+	.. code-block:: python
+
+		print font.glyphs['A']
+		<GSGlyph "A" with 4 layers>
+
+	.. code-block:: python
+
+		print font.glyphs[20]
+		<GSGlyph "Aacute" with 2 layers>
+
+	:type: list, dict
+
+.. attribute:: classes
+
+	Collection of :class:`GSClass <GSClass>` objects, representing OpenType glyph classes.
+
+	:type: list
+
+.. attribute:: features
+
+	Collection of :class:`GSFeature <GSFeature>` objects, representing OpenType features.
+
+	:type: list
+
+.. attribute:: copyright
+
+
+	:type: unicode
+
+.. attribute:: designer
+
+
+	:type: unicode
+
+.. attribute:: designerURL
+
+
+	:type: unicode
+
+.. attribute:: manufacturer
+
+
+	:type: unicode
+
+.. attribute:: manufacturerURL
+
+
+	:type: unicode
+
+.. attribute:: versionMajor
+
+
+	:type: int
+
+.. attribute:: versionMinor
+
+
+	:type: int
+
+.. attribute:: date
+
+
+	:type: NSDate
+
+.. attribute:: familyName
+
+	Family name of the typeface.
+
+	:type: string
+
+.. attribute:: upm
+
+	Units per Em
+
+	:type: int
+
+.. attribute:: note
+
+
+	:type: string
+
+.. attribute:: kerning
+
+	A multi-level dictionary. The first level's key is the :class:`GSFontMaster <GSFontMaster>`.id (each master has its own kerning), the second level's key is the :class:`GSGlyph <GSGlyph>`.id or class id (@MMK_L_XX), the third level's key is again a glyph id or class id (@MMK_R_XX). The values are the actual kerning values.
+	
+	To set a value, is is better to use the method Font.setKerningForPair(). This ensures a better data integrety (and is faster).
+
+	:type: dict, int
+
+
+.. attribute:: userData
+
+	A dictionary to store user data. Use a unique Key and only use object that can be stored in a Property list (string, list, dict, numbers, NSData) otherwise the date will not be recoverable from the saved file.
+
+	:type: dict
+
+.. attribute:: disablesNiceNames
+
+	Corresponds to the "Don't use nice names" setting from the Info dialogue.
+
+	:type: bool
+
+.. attribute:: gridLength
+
+	Corresponds to the "Grid spacing" setting from the Info dialogue. When set to 0, point positions may contains float values.
+
+	:type: int
+
+---------
+Functions
+---------
+
+.. function:: kerningForPair(FontMasterId, LeftKey, RightKey)
+	
+	This returns the kerning value for the two specified glyphs (LeftKey or RightKey is the glyphname) or a kerning group key (@MMK_X_XX).
+	
+	:param FontMasterId: The id of the FontMaster
+
+	:type FontMasterId: str
+	:param LeftKey: either a glyph name or a class name
+
+	:type LeftKey: str
+	:param RightKey: either a glyph name or a class name
+
+	:type RightKey: str
+	:return: The kerning value
+	:rtype: float
+.. function:: setKerningForPair(FontMasterId, LeftKey, RightKey, Value)
+	
+	This sets the kerning for the two specified glyphs (LeftKey or RightKey is the glyphname) or a kerning group key (@MMK_X_XX).
+	
+	:param FontMasterId: The id of the FontMaster
+
+	:type FontMasterId: str
+	:param LeftKey: either a glyph name or a class name
+
+	:type LeftKey: str
+	:param RightKey: either a glyph name or a class name
+
+	:type RightKey: str
+	:param Value: kerning value
+
+	:type Value: float
+.. function:: removeKerningForPair(FontMasterId, LeftKey, RightKey)
+	
+	Removes the kerning for the two specified glyphs (LeftKey or RightKey is the glyphname) or a kerning group key (@MMK_X_XX).
+	
+	:param FontMasterId: The id of the FontMaster
+
+	:type FontMasterId: str
+	:param LeftKey: either a glyph name or a class name
+
+	:type LeftKey: str
+	:param RightKey: either a glyph name or a class name
+
+	:type RightKey: str
+
+
+:mod:`GSFontMaster`
+===============================================================================
+
+Implementation of the master object. This corresponds more or less with the "Masters" pane in the Font Info.
+
+In Glyphs.app the glyphs of each master are reachable not here, but as :class:`Layers <GSLayer>` attached to the :class:`Glyphs <GSGlyph>` attached to the :class:`Font <GSFont>` object. See info graphic on top for better understanding.
+
+.. class:: GSFontMaster
+
+
+
+
+.. autosummary::
+
+	name
+	id
+	weight
+	width
+	weightValue
+	widthValue
+	custom
+	customValue
+	ascender
+	capHeight
+	xHeight
+	descender
+	italicAngle
+	verticalStems
+	horizontalStems
+	alignmentZones
+	guideLines
+	userData
+	customParameters
+
+----------
+Properties
+----------
+
+
+
+.. attribute:: id
+
+	Used to identify :class:`GSLayer <Layer>` in the Glyph
+
+	:type: unicode
+
+.. attribute:: name
+
+
+	:type: string
+
+.. attribute:: weight
+
+
+	:type: string
+
+.. attribute:: width
+
+
+	:type: string
+
+.. attribute:: weightValue
+
+	Values for interpolation in design space.
+
+	:type: float
+
+.. attribute:: widthValue
+
+	Values for interpolation in design space.
+
+	:type: float
+
+.. attribute:: custom
+
+
+	:type: string
+
+.. attribute:: customValue
+
+	Values for interpolation in design space.
+
+.. attribute:: ascender
+
+
+	:type: float
+
+.. attribute:: capHeight
+
+
+	:type: float
+
+.. attribute:: xHeight
+
+
+	:type: float
+
+.. attribute:: descender
+
+
+	:type: float
+
+.. attribute:: italicAngle
+
+
+	:type: float
+
+.. attribute:: verticalStems
+
+	List of vertical stem values
+
+	:type: list
+
+.. attribute:: horizontalStems
+
+	List of horizontal stem values
+
+	:type: list
+
+.. attribute:: alignmentZones
+
+	Collection of :class:`GSAlignmentZone <GSAlignmentZone>`.
+
+	:type: list
+
+.. attribute:: guideLines
+
+	Collection of :class:`GSGuideLine <GSGuideLine>`.
+
+	:type: list
+
+.. attribute:: userData
+
+	A dictionary to store user data. Use a unique Key and only use object that can be stored in a Property list (string, list, dict, numbers, NSData) otherwise the date will not be recoverable from the saved file.
+
+	:type: dict
+
+.. attribute:: customParameters
+
+	A dictionary of custom parameters
+
+	:type: dict
+
+
+:mod:`GSInstance`
+===============================================================================
+
+Implementation of the instance object. This corresponds more or less with the "Instances" pane in the Font Info.
+
+.. class:: GSInstance
+
+
+
+.. autosummary::
+
+	active
+	name
+	weight
+	width
+	weightValue
+	widthValue
+	isItalic
+	isBold
+	linkStyle
+	customParameters
+
+----------
+Properties
+----------
+
+
+
+.. attribute:: active
+
+
+	:type: bool
+
+.. attribute:: name
+
+
+	:type: string
+
+.. attribute:: weight
+
+
+	:type: string
+
+.. attribute:: width
+
+
+	:type: string
+
+.. attribute:: weightValue
+
+	Values for interpolation in design space.
+
+	:type: float
+
+.. attribute:: widthValue
+
+	Values for interpolation in design space.
+
+	:type: float
+
+.. attribute:: isItalic
+
+	Italic flag for style linking
+
+	:type: bool
+
+.. attribute:: isBold
+
+	Bold flag for style linking
+
+	:type: bool
+
+.. attribute:: linkStyle
+
+	Linked style
+
+	:type: string
+
+.. attribute:: customParameters
+
+	A dictionary of custom parameters
+
+	:type: dict
+
+:mod:`GSClass`
+===============================================================================
+
+Implementation of the class object. It is used to implement OpenType classes in the font infos
+
+.. class:: GSClass
+
+Properties
+
+.. autosummary::
+
+	name
+	code
+	automatic
+
+----------
+Properties
+----------
+
+
+
+.. attribute:: name
+
+	The Class name
+
+	:type: unicode
+
+.. attribute:: code
+
+	A String with space seperated glyph names.
+
+	:type: unicode
+
+
+.. attribute:: automatic
+
+	Auto-generate this class
+
+	:type: bool
+
+
+
+:mod:`GSFeature`
+===============================================================================
+
+Implementation of the feature object. It is used to implement OpenType Features in the Font Info.
+
+.. class:: GSFeature([tag])
+	
+	:param tag: The feature name
+	
+Properties
+
+.. autosummary::
+
+	name
+	code
+	automatic
+
+Functions
+
+.. autosummary::
+
+	update
+	
+
+----------
+Properties
+----------
+
+
+
+.. attribute:: name
+
+	The feature name
+
+	:type: unicode
+
+.. attribute:: code
+
+	The Feature code in Adobe FDK syntax.
+
+	:type: unicode
+
+.. attribute:: automatic
+
+	Auto-generate this feature
+
+	:type: bool
+
+
+
+---------
+Functions
+---------
+
+
+
+.. function:: update()
+	
+	Calls the automatic feature code generator for this feature.
+	
+	:return: None
+
+
+
+
+:mod:`GSGlyph`
+===============================================================================
+
+Implementation of the glyph object
+
+.. class:: GSGlyph([name])
+	
+	:param name: The glyph name
+
+.. autosummary::
+
+	parent
+	layers
+	name
+	unicode
+	id
+	category
+	subCategory
+	script
+	leftKerningGroup
+	rightKerningGroup
+	leftMetricsKey
+	rightMetricsKey
+	export
+	color
+	note
+	
+
+----------
+Properties
+----------
+	
+
+
+.. attribute:: parent
+
+	Reference to the :class:`Font <GSFont>` object.
+
+	:type: GSFont
+
+.. attribute:: layers
+
+	The layers of the glyph, collection of :class:`GSLayer <GSLayer>` objects. You can access them either by index or by :class:`GSFontMaster <GSFontMaster>`.id.
+
+	:type: list, dict
+
+.. attribute:: name
+
+	The name of the glyph. It will be converted to a "nice name" (afii10017 to A-cy) (you can disable this behavior in font info or the app preference)
+
+	:type: unicode
+
+.. attribute:: unicode
+
+	It will be automatically set; Read only.
+
+	:type: unicode
+
+.. attribute:: id
+
+	An unique identifierer for each glyph
+
+	:type: unicode
+
+.. attribute:: category
+
+	The category of the glyph. e.g. 'Letter', 'Symbol'
+
+	:type: unicode
+
+.. attribute:: subCategory
+
+	The subCategory of the glyph. e.g. 'Uppercase', 'Math'
+
+	:type: unicode
+
+.. attribute:: script
+
+	The script of the glyph, e.g. 'Latin', 'Arabic'.
+
+	:type: unicode
+
+.. attribute:: leftKerningGroup
+
+	The leftKerningGroup of the glyph. All glyphs with the same text in the kerning group end up in the same kerning class.
+
+	:type: unicode
+
+.. attribute:: rightKerningGroup
+
+	The rightKerningGroup of the glyph. All glyphs with the same text in the kerning group end up in the same kerning class.
+
+	:type: unicode
+
+.. attribute:: leftMetricsKey
+
+	The leftMetricsKey of the glyph. This is a reference to another glyph by name. It is used to synchronize the metrics with the linked glyph.
+
+	:type: unicode
+
+.. attribute:: rightMetricsKey
+
+	The rightMetricsKey of the glyph. This is a reference to another glyph by name. It is used to synchronize the metrics with the linked glyph.
+
+	:type: unicode
+
+.. attribute:: export
+
+	Glyphs should export upon font generation
+
+	:type: bool
+
+.. attribute:: color
+
+	Color marking of glyph in UI
+
+	:type: int
+
+.. attribute:: note
+
+
+	:type: unicode
+
+
+:mod:`GSLayer`
+===============================================================================
+
+Implementation of the layer object
+
+.. class:: GSLayer()
+
+**Properties**
+
+.. autosummary::
+	
+	parent
+	name
+	associatedMasterId
+	layerId
+	components
+	guideLines
+	hints
+	anchors
+	paths
+	LSB
+	RSB
+	width
+		
+**Functions**
+
+.. autosummary::
+	
+	decomposeComponents
+	compareString
+	connectAllOpenPaths
+	copyDecomposedLayer
+	syncMetrics
+	correctPathDirection
+
+----------
+Properties
+----------
+
+
+	
+
+.. attribute:: parent
+
+	Reference to the :class:`Glyph <GSGlyph>` object.
+
+	:type: GSGlyph
+
+.. attribute:: name
+
+	Name of layer
+
+	:type: unicode
+
+.. attribute:: associatedMasterId
+
+	The ID of the :class:`FontMaster <GSFontMaster>` this layer belongs to.
+
+	:type: unicode
+
+.. attribute:: layerId
+
+	The layer key is used to access the layer in the :class:`glyphs <GSGlyph>` layer dictionary.
+	
+	For master layers this should be the id of the :class:`FontMaster <GSFontMaster>`.
+	It could look like this: "FBCA074D-FCF3-427E-A700-7E318A949AE5"
+
+	:type: unicode
+
+.. attribute:: components
+
+	Collection of :class:`GSComponent <GSComponent>` objects
+
+	:type: list
+
+.. attribute:: guideLines
+
+	List of :class:`GSGuideLine <GSGuideLine>` objects.
+
+	:type: list
+
+.. attribute:: hints
+
+	List of :class:`GSHint <GSHint>` objects.
+
+	:type: list
+
+.. attribute:: anchors
+
+	Dictionary of :class:`GSAnchor <GSAnchor>` objects. The name of the anchor is the key, the :class:`GSAnchor <GSAnchor>` is the value.
+	
+
+	.. code-block:: python
+
+
+		for name, anchor in layer.anchors:
+			print name, anchor
+		ogonek <GSAnchor "ogonek" x=630.0 y=0.0>
+	
+
+
+	:type: dict
+
+.. attribute:: paths
+
+	List of :class:`GSPath <GSPath>` objects.
+
+	:type: list
+
+.. attribute:: LSB
+
+	Left side bearing
+
+	:type: float
+
+.. attribute:: RSB
+
+	Right side bearing
+
+	:type: float
+
+.. attribute:: width
+
+	Glyph width
+
+	:type: float
+
+
+---------
+Functions
+---------
+
+.. function:: decomposeComponents()
+	
+	Decomposes all components of the layer at once.
+
+.. function:: compareString()
+	
+	Returns a string representing the outline structure of the glyph, for compatibility comparison.
+
+	:return: The comparison string
+
+	:rtype: string
+
+.. function:: connectAllOpenPaths()
+	
+	Closes all open paths when end points are further than 1 unit away from each other.
+
+
+.. function:: copyDecomposedLayer()
+	
+	Returns a copy of the layer with all components already decomposed.
+
+	:return: A new layer object
+
+	:rtype: :class:`GSLayer <GSLayer>`
+
+.. function:: syncMetrics()
+	
+	Take over LSB and RSB from linked glyph.
+
+.. function:: correctPathDirection()
+	
+	Corrects the path direction.
+
+
+	
+
+
+
+:mod:`GSAnchor`
+===============================================================================
+
+Implementation of the anchor object.
+
+.. class:: Anchor([name, pt])
+	
+	:param name: the name of the anchor
+	:param pt: the position of the anchor
+
+.. autosummary::
+	
+	position
+	name
+	
+
+----------
+Properties
+----------
+
+
+
+.. attribute:: position
+
+	The position of the anchor
+
+	:type: NSPoint
+
+.. attribute:: name
+
+	The name of the anchor
+
+	:type: unicode
+
+
+:mod:`GSComponent`
+===============================================================================
+
+.. class:: GSComponent(glyph [, pt] )
+	
+	Implementation of the component object.
+	
+	:param glyph: a glyph object or the glyph name
+	:param pt: the position of the component
+
+**Properties**
+
+.. autosummary::
+	
+	position
+	componentName
+	component
+	transform
+	bounds
+	
+**Functions**
+
+.. autosummary::
+	
+	decompose
+
+
+----------
+Properties
+----------
+
+	
+
+.. attribute:: position
+
+	The Position of the component.
+
+	:type: NSPoint
+
+.. attribute:: componentName
+
+	The glyph name the component is pointing to.
+
+	:type: unicode
+
+.. attribute:: component
+
+	The :class:`GSGlyph <GSGlyph>` the component is pointing to. This is read only. Set the componentName to the glyph name.
+
+	:type: :class:`GSGlyph <GSGlyph>`
+
+
+.. attribute:: transform
+
+	
+
+	:type: NSAffineTransformStruct
+
+.. attribute:: bounds
+
+	
+	Bounding box of the component, read only
+	
+
+	:type: NSRect
+
+
+----------
+Functions
+----------
+
+
+.. function:: decompose()
+	
+	Decomposes the component
+
+
+
+:mod:`GSPath`
+===============================================================================
+
+Implementation of the path object.
+
+.. class:: GSPath
+
+**Properties**
+
+.. autosummary::
+	
+	parent
+	nodes
+	segments
+	closed
+	direction
+	bounds
+	
+**Functions**
+
+.. autosummary::
+	
+	reverse
+
+----------
+Properties
+----------
+
+	
+
+
+.. attribute:: parent
+
+	Reference to the :class:`Glyph <GSGlyph>` object.
+
+	:type: GSGlyph
+
+.. attribute:: nodes
+
+	A list of :class:`GSNode <GSNode>` objects
+
+	:type: list
+
+.. attribute:: segments
+
+	A list of segments as NSPoint objects. Two objects represent a line, four represent a courve. Start point of the segment is included.
+
+	:type: list
+
+.. attribute:: closed
+
+	Returnes True if the the path is closed
+
+	:type: bool
+
+.. attribute:: direction
+
+	Path direction. -1 for counter clockwise, 1 for clockwise.
+
+	:type: int
+
+.. attribute:: bounds
+
+	Bounding box of the component, read only
+
+	:type: NSRect
+
+
+----------
+Functions
+----------
+
+.. function:: reverse()
+	
+	Reverses the path direction
+
+
+
+:mod:`GSNode`
+===============================================================================
+
+Implementation of the node object.
+
+.. class:: GSNode([pt, type])
+	
+	:param pt: The position of the node.
+	:param type: The type of the node, GSLINE, GSCURVE or GSOFFCURVE
+
+.. autosummary::
+	
+	position
+	type
+	connection
+
+----------
+Properties
+----------
+
+	
+
+.. attribute:: position
+
+	The position of the node.
+
+	:type: NSPoint
+
+.. attribute:: type
+
+	The type of the node, GSLINE, GSCURVE or GSOFFCURVE
+
+	:type: int
+
+.. attribute:: connection
+
+	The type of the connection, GSSHARP or GSSMOOTH
+
+	:type: int
+
+
+:mod:`GSGuideLine`
+===============================================================================
+
+Implementation of the guide line object.
+
+.. class:: GSGuideLine
+
+.. autosummary::
+	
+	position
+	angle
+	
+
+----------
+Properties
+----------
+
+	
+
+.. attribute:: position
+
+	The position of the node.
+
+	:type: NSPoint
+
+.. attribute:: angle
+
+	Angle
+
+	:type: int
+
+
+:mod:`GSHint`
+===============================================================================
+
+Implementation of the hint object.
+
+.. class:: GSHint
+
+.. autosummary::
+	
+	originNode
+	targetNode
+	ghost
+	horizontal
+
+----------
+Properties
+----------
+
+	
+
+.. attribute:: originNode
+
+	The the first node this hint is attached to.
+
+	:type: GSNode
+
+.. attribute:: targetNode
+
+	The the second node this hint is attached to. In case of a ghost hint this value will be empty.
+
+	:type: GSNode
+
+.. attribute:: ghost
+
+	-1 for a top ghost hint, 1 for a bottom ghost hint or 0 if it's not a ghost hint.
+
+	:type: int
+
+.. attribute:: horizontal
+
+	True if hint is horizontal, False if vertical.
+
+	:type: bool
+
+
+Methods
+=======
+
+.. autosummary::
+
+	niceName()
+	divideCurve()
+	distance()
+	addPoints()
+	substractPoints()
+	GetFile()
+
+	
+.. function:: niceName(Name)
+	
+	Converts the Name in a readable name. (converts "uni01D1" in "Ocaron")
+	
+	:param Name: A glyph name
+	:return: The converted Name.
+	:rtype: string
+.. function:: divideCurve(P0, P1, P2, P3, t)
+	
+	Divides the curve using the De Casteljau's algorithm.
+	
+	:param P0: The Start point of the Curve (NSPoint)
+	:param P1: The first off curve point
+	:param P2: The second off curve point
+	:param P3: The End point of the Curve
+	:param t: The time paramter
+	:return: A list of points that represent two curves. (Q0, Q1, Q2, Q3, R1, R2, R3). Note that the "middle" point is only returned once.
+	:rtype: list
+.. function:: distance(P0, P1)
+	
+	calculates the distance between two NSPoints
+	
+	:param P0: a NSPoint
+	:param P1: another NSPoint
+	:return: The distance
+	:rtype: float
+.. function:: addPoints(P1, P2)
+	
+	Add the points.
+
+	:param P0: a NSPoint
+	:param P1: another NSPoint
+	:return: The sum of both points
+	:rtype: NSPoint
+.. function:: substractPoints(P1, P2)
+	
+	Subtracts the points.
+	
+	:param P0: a NSPoint
+	:param P1: another NSPoint
+	:return: The substractzed point
+	:rtype: NSPoint
+.. function:: scalePoint(P, scalar)
+	
+	Scaled a point.
+
+	:param P: a NSPoint
+	:param scalar: The Multiplier
+	:return: The multiplied point
+	:rtype: NSPoint
+
+.. function:: GetFile(message=None, filetypes = None, selectFolders = True, selectFiles = True)
+	
+	Opens a file chooser dialog.
+	
+	:param message:
+	:param filestypes:
+	:param selectFolders:
+	:param selectFiles:
+	:return: The selected file or None
+	:rtype: unicode
+
+.. function:: GetFolder(message=None, allowsMultipleSelection = False)
+	
+	Opens a folder chooser dialog.
+	
+	:param message:
+	:param allowsMultipleSelection:
+	:return: The selected folder or None
+	:rtype: unicode

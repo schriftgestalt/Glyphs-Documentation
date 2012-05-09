@@ -1,0 +1,2721 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Glyphs.app Python Scripting API Documentation &mdash; Glyphs.app Python Scripting API 0.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Glyphs.app Python Scripting API 0.3 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">Glyphs.app Python Scripting API 0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="glyphs-app-python-scripting-api-documentation">
+<h1>Glyphs.app Python Scripting API Documentation<a class="headerlink" href="#glyphs-app-python-scripting-api-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This is the documentation for the Python Scripting API for Glyphs.app (<a class="reference external" href="http://glyphsapp.com/">glyphsapp.com</a>)</p>
+<p>Calling font objects starts with the mothership, the Glyphs object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">Glyphs</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">&lt;</span><span class="n">Glyphs</span><span class="o">.</span><span class="n">app</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The currently open fonts are attached to it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># topmost open font</span>
+<span class="n">font</span> <span class="o">=</span> <span class="n">Glyphs</span><span class="o">.</span><span class="n">font</span>
+<span class="k">print</span> <span class="n">font</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">&lt;</span><span class="n">GSFont</span> <span class="s">&quot;My Font&quot;</span> <span class="n">v1</span><span class="o">.</span><span class="mi">0</span> <span class="k">with</span> <span class="mi">2</span> <span class="n">masters</span> <span class="ow">and</span> <span class="mi">5</span> <span class="n">instances</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># all open fonts</span>
+<span class="n">fonts</span> <span class="o">=</span> <span class="n">Glyphs</span><span class="o">.</span><span class="n">fonts</span>
+<span class="k">print</span> <span class="n">fonts</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="o">&lt;</span><span class="n">GSFont</span> <span class="s">&quot;My Font&quot;</span> <span class="n">v1</span><span class="o">.</span><span class="mi">0</span> <span class="k">with</span> <span class="mi">2</span> <span class="n">masters</span> <span class="ow">and</span> <span class="mi">5</span> <span class="n">instances</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="o">&lt;</span><span class="n">GSFont</span> <span class="s">&quot;My Other Font&quot;</span> <span class="n">v1</span><span class="o">.</span><span class="mi">0</span> <span class="k">with</span> <span class="mi">1</span> <span class="n">masters</span> <span class="ow">and</span> <span class="mi">1</span> <span class="n">instances</span><span class="o">&gt;</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/objectmodel.png" src="_images/objectmodel.png" />
+</div>
+<div class="section" id="constants">
+<h1>Constants<a class="headerlink" href="#constants" title="Permalink to this headline">¶</a></h1>
+<p>GSMOVE = 17</p>
+<p>GSLINE = 1</p>
+<p>GSCURVE = 35</p>
+<p>GSOFFCURVE = 65</p>
+<p>GSSHARP = 0</p>
+<p>GSSMOOTH = 4096</p>
+</div>
+<div class="section" id="gsfont">
+<h1><a class="reference internal" href="#GSFont" title="GSFont"><tt class="xref py py-mod docutils literal"><span class="pre">GSFont</span></tt></a><a class="headerlink" href="#gsfont" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the font object. This object is host to the <a class="reference internal" href="#GSFontMaster" title="GSFontMaster"><tt class="xref py py-class docutils literal"><span class="pre">Masters</span></tt></a> used for interpolation. Even when no interpolation is involved, for the sake of object model consistency there will still be one master and one instance representing a single font.</p>
+<p>Also, the <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">Glyphs</span></tt></a> are attached to the Font object right here, not one level down to the masters. The different master&#8217;s glyphs are available as <a class="reference internal" href="#GSLayer" title="GSLayer"><tt class="xref py py-class docutils literal"><span class="pre">Layers</span></tt></a> attached to the <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">Glyph</span></tt></a> objects which are attached here.</p>
+<dl class="class">
+<dt id="GSFont">
+<em class="property">class </em><tt class="descname">GSFont</tt><a class="headerlink" href="#GSFont" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>Properties</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#masters" title="masters"><tt class="xref py py-obj docutils literal"><span class="pre">masters</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#instances" title="instances"><tt class="xref py py-obj docutils literal"><span class="pre">instances</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#glyphs" title="glyphs"><tt class="xref py py-obj docutils literal"><span class="pre">glyphs</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#classes" title="classes"><tt class="xref py py-obj docutils literal"><span class="pre">classes</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#features" title="features"><tt class="xref py py-obj docutils literal"><span class="pre">features</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#copyright" title="copyright"><tt class="xref py py-obj docutils literal"><span class="pre">copyright</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#designer" title="designer"><tt class="xref py py-obj docutils literal"><span class="pre">designer</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#designerURL" title="designerURL"><tt class="xref py py-obj docutils literal"><span class="pre">designerURL</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#manufacturer" title="manufacturer"><tt class="xref py py-obj docutils literal"><span class="pre">manufacturer</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#manufacturerURL" title="manufacturerURL"><tt class="xref py py-obj docutils literal"><span class="pre">manufacturerURL</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#versionMajor" title="versionMajor"><tt class="xref py py-obj docutils literal"><span class="pre">versionMajor</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#versionMinor" title="versionMinor"><tt class="xref py py-obj docutils literal"><span class="pre">versionMinor</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#date" title="date"><tt class="xref py py-obj docutils literal"><span class="pre">date</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#familyName" title="familyName"><tt class="xref py py-obj docutils literal"><span class="pre">familyName</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#upm" title="upm"><tt class="xref py py-obj docutils literal"><span class="pre">upm</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#note" title="note"><tt class="xref py py-obj docutils literal"><span class="pre">note</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#kerning" title="kerning"><tt class="xref py py-obj docutils literal"><span class="pre">kerning</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#userData" title="userData"><tt class="xref py py-obj docutils literal"><span class="pre">userData</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#gridLength" title="gridLength"><tt class="xref py py-obj docutils literal"><span class="pre">gridLength</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#disablesNiceNames" title="disablesNiceNames"><tt class="xref py py-obj docutils literal"><span class="pre">disablesNiceNames</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#kerningForPair" title="kerningForPair"><tt class="xref py py-obj docutils literal"><span class="pre">kerningForPair()</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#setKerningForPair" title="setKerningForPair"><tt class="xref py py-obj docutils literal"><span class="pre">setKerningForPair()</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#removeKerningForPair" title="removeKerningForPair"><tt class="xref py py-obj docutils literal"><span class="pre">removeKerningForPair()</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="masters">
+<tt class="descname">masters</tt><a class="headerlink" href="#masters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <a class="reference internal" href="#GSFontMaster" title="GSFontMaster"><tt class="xref py py-class docutils literal"><span class="pre">GSFontMaster</span></tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="instances">
+<tt class="descname">instances</tt><a class="headerlink" href="#instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <a class="reference internal" href="#GSInstance" title="GSInstance"><tt class="xref py py-class docutils literal"><span class="pre">GSInstance</span></tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="glyphs">
+<tt class="descname">glyphs</tt><a class="headerlink" href="#glyphs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">GSGlyph</span></tt></a>. Returns a list, but you may also call glyphs using index or glyph name as key.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">font</span><span class="o">.</span><span class="n">glyphs</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">GSGlyph</span> <span class="s">&quot;A&quot;</span> <span class="k">with</span> <span class="mi">4</span> <span class="n">layers</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="n">font</span><span class="o">.</span><span class="n">glyphs</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">GSGlyph</span> <span class="s">&quot;Aacute&quot;</span> <span class="k">with</span> <span class="mi">2</span> <span class="n">layers</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list, dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="classes">
+<tt class="descname">classes</tt><a class="headerlink" href="#classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <a class="reference internal" href="#GSClass" title="GSClass"><tt class="xref py py-class docutils literal"><span class="pre">GSClass</span></tt></a> objects, representing OpenType glyph classes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="features">
+<tt class="descname">features</tt><a class="headerlink" href="#features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <a class="reference internal" href="#GSFeature" title="GSFeature"><tt class="xref py py-class docutils literal"><span class="pre">GSFeature</span></tt></a> objects, representing OpenType features.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="copyright">
+<tt class="descname">copyright</tt><a class="headerlink" href="#copyright" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="designer">
+<tt class="descname">designer</tt><a class="headerlink" href="#designer" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="designerURL">
+<tt class="descname">designerURL</tt><a class="headerlink" href="#designerURL" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="manufacturer">
+<tt class="descname">manufacturer</tt><a class="headerlink" href="#manufacturer" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="manufacturerURL">
+<tt class="descname">manufacturerURL</tt><a class="headerlink" href="#manufacturerURL" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="versionMajor">
+<tt class="descname">versionMajor</tt><a class="headerlink" href="#versionMajor" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="versionMinor">
+<tt class="descname">versionMinor</tt><a class="headerlink" href="#versionMinor" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="date">
+<tt class="descname">date</tt><a class="headerlink" href="#date" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSDate</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="familyName">
+<tt class="descname">familyName</tt><a class="headerlink" href="#familyName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Family name of the typeface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="upm">
+<tt class="descname">upm</tt><a class="headerlink" href="#upm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Units per Em</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="note">
+<tt class="descname">note</tt><a class="headerlink" href="#note" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kerning">
+<tt class="descname">kerning</tt><a class="headerlink" href="#kerning" title="Permalink to this definition">¶</a></dt>
+<dd><p>A multi-level dictionary. The first level&#8217;s key is the <a class="reference internal" href="#GSFontMaster" title="GSFontMaster"><tt class="xref py py-class docutils literal"><span class="pre">GSFontMaster</span></tt></a>.id (each master has its own kerning), the second level&#8217;s key is the <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">GSGlyph</span></tt></a>.id or class id (&#64;MMK_L_XX), the third level&#8217;s key is again a glyph id or class id (&#64;MMK_R_XX). The values are the actual kerning values.</p>
+<p>To set a value, is is better to use the method Font.setKerningForPair(). This ensures a better data integrety (and is faster).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">dict, int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="userData">
+<tt class="descname">userData</tt><a class="headerlink" href="#userData" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary to store user data. Use a unique Key and only use object that can be stored in a Property list (string, list, dict, numbers, NSData) otherwise the date will not be recoverable from the saved file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="disablesNiceNames">
+<tt class="descname">disablesNiceNames</tt><a class="headerlink" href="#disablesNiceNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corresponds to the &#8220;Don&#8217;t use nice names&#8221; setting from the Info dialogue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gridLength">
+<tt class="descname">gridLength</tt><a class="headerlink" href="#gridLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corresponds to the &#8220;Grid spacing&#8221; setting from the Info dialogue. When set to 0, point positions may contains float values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="kerningForPair">
+<tt class="descname">kerningForPair</tt><big>(</big><em>FontMasterId</em>, <em>LeftKey</em>, <em>RightKey</em><big>)</big><a class="headerlink" href="#kerningForPair" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns the kerning value for the two specified glyphs (LeftKey or RightKey is the glyphname) or a kerning group key (&#64;MMK_X_XX).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>FontMasterId</strong> (<em>str</em>) &#8211; The id of the FontMaster</li>
+<li><strong>LeftKey</strong> (<em>str</em>) &#8211; either a glyph name or a class name</li>
+<li><strong>RightKey</strong> (<em>str</em>) &#8211; either a glyph name or a class name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The kerning value</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="setKerningForPair">
+<tt class="descname">setKerningForPair</tt><big>(</big><em>FontMasterId</em>, <em>LeftKey</em>, <em>RightKey</em>, <em>Value</em><big>)</big><a class="headerlink" href="#setKerningForPair" title="Permalink to this definition">¶</a></dt>
+<dd><p>This sets the kerning for the two specified glyphs (LeftKey or RightKey is the glyphname) or a kerning group key (&#64;MMK_X_XX).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>FontMasterId</strong> (<em>str</em>) &#8211; The id of the FontMaster</li>
+<li><strong>LeftKey</strong> (<em>str</em>) &#8211; either a glyph name or a class name</li>
+<li><strong>RightKey</strong> (<em>str</em>) &#8211; either a glyph name or a class name</li>
+<li><strong>Value</strong> (<em>float</em>) &#8211; kerning value</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="removeKerningForPair">
+<tt class="descname">removeKerningForPair</tt><big>(</big><em>FontMasterId</em>, <em>LeftKey</em>, <em>RightKey</em><big>)</big><a class="headerlink" href="#removeKerningForPair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the kerning for the two specified glyphs (LeftKey or RightKey is the glyphname) or a kerning group key (&#64;MMK_X_XX).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>FontMasterId</strong> (<em>str</em>) &#8211; The id of the FontMaster</li>
+<li><strong>LeftKey</strong> (<em>str</em>) &#8211; either a glyph name or a class name</li>
+<li><strong>RightKey</strong> (<em>str</em>) &#8211; either a glyph name or a class name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsfontmaster">
+<h1><a class="reference internal" href="#GSFontMaster" title="GSFontMaster"><tt class="xref py py-mod docutils literal"><span class="pre">GSFontMaster</span></tt></a><a class="headerlink" href="#gsfontmaster" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the master object. This corresponds more or less with the &#8220;Masters&#8221; pane in the Font Info.</p>
+<p>In Glyphs.app the glyphs of each master are reachable not here, but as <a class="reference internal" href="#GSLayer" title="GSLayer"><tt class="xref py py-class docutils literal"><span class="pre">Layers</span></tt></a> attached to the <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">Glyphs</span></tt></a> attached to the <a class="reference internal" href="#GSFont" title="GSFont"><tt class="xref py py-class docutils literal"><span class="pre">Font</span></tt></a> object. See info graphic on top for better understanding.</p>
+<dl class="class">
+<dt id="GSFontMaster">
+<em class="property">class </em><tt class="descname">GSFontMaster</tt><a class="headerlink" href="#GSFontMaster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#name" title="name"><tt class="xref py py-obj docutils literal"><span class="pre">name</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#id" title="id"><tt class="xref py py-obj docutils literal"><span class="pre">id</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#weight" title="weight"><tt class="xref py py-obj docutils literal"><span class="pre">weight</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#width" title="width"><tt class="xref py py-obj docutils literal"><span class="pre">width</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#weightValue" title="weightValue"><tt class="xref py py-obj docutils literal"><span class="pre">weightValue</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#widthValue" title="widthValue"><tt class="xref py py-obj docutils literal"><span class="pre">widthValue</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#custom" title="custom"><tt class="xref py py-obj docutils literal"><span class="pre">custom</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#customValue" title="customValue"><tt class="xref py py-obj docutils literal"><span class="pre">customValue</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#ascender" title="ascender"><tt class="xref py py-obj docutils literal"><span class="pre">ascender</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#capHeight" title="capHeight"><tt class="xref py py-obj docutils literal"><span class="pre">capHeight</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#xHeight" title="xHeight"><tt class="xref py py-obj docutils literal"><span class="pre">xHeight</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#descender" title="descender"><tt class="xref py py-obj docutils literal"><span class="pre">descender</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#italicAngle" title="italicAngle"><tt class="xref py py-obj docutils literal"><span class="pre">italicAngle</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#verticalStems" title="verticalStems"><tt class="xref py py-obj docutils literal"><span class="pre">verticalStems</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#horizontalStems" title="horizontalStems"><tt class="xref py py-obj docutils literal"><span class="pre">horizontalStems</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#alignmentZones" title="alignmentZones"><tt class="xref py py-obj docutils literal"><span class="pre">alignmentZones</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#guideLines" title="guideLines"><tt class="xref py py-obj docutils literal"><span class="pre">guideLines</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#userData" title="userData"><tt class="xref py py-obj docutils literal"><span class="pre">userData</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#customParameters" title="customParameters"><tt class="xref py py-obj docutils literal"><span class="pre">customParameters</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id1">
+<h2>Properties<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="id">
+<tt class="descname">id</tt><a class="headerlink" href="#id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to identify <tt class="xref py py-class docutils literal"><span class="pre">GSLayer</span></tt> in the Glyph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="name">
+<tt class="descname">name</tt><a class="headerlink" href="#name" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="weight">
+<tt class="descname">weight</tt><a class="headerlink" href="#weight" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="width">
+<tt class="descname">width</tt><a class="headerlink" href="#width" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="weightValue">
+<tt class="descname">weightValue</tt><a class="headerlink" href="#weightValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Values for interpolation in design space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="widthValue">
+<tt class="descname">widthValue</tt><a class="headerlink" href="#widthValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Values for interpolation in design space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="custom">
+<tt class="descname">custom</tt><a class="headerlink" href="#custom" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="customValue">
+<tt class="descname">customValue</tt><a class="headerlink" href="#customValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Values for interpolation in design space.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ascender">
+<tt class="descname">ascender</tt><a class="headerlink" href="#ascender" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="capHeight">
+<tt class="descname">capHeight</tt><a class="headerlink" href="#capHeight" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xHeight">
+<tt class="descname">xHeight</tt><a class="headerlink" href="#xHeight" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="descender">
+<tt class="descname">descender</tt><a class="headerlink" href="#descender" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="italicAngle">
+<tt class="descname">italicAngle</tt><a class="headerlink" href="#italicAngle" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="verticalStems">
+<tt class="descname">verticalStems</tt><a class="headerlink" href="#verticalStems" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of vertical stem values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="horizontalStems">
+<tt class="descname">horizontalStems</tt><a class="headerlink" href="#horizontalStems" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of horizontal stem values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alignmentZones">
+<tt class="descname">alignmentZones</tt><a class="headerlink" href="#alignmentZones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <tt class="xref py py-class docutils literal"><span class="pre">GSAlignmentZone</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="guideLines">
+<tt class="descname">guideLines</tt><a class="headerlink" href="#guideLines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <a class="reference internal" href="#GSGuideLine" title="GSGuideLine"><tt class="xref py py-class docutils literal"><span class="pre">GSGuideLine</span></tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">userData</tt></dt>
+<dd><p>A dictionary to store user data. Use a unique Key and only use object that can be stored in a Property list (string, list, dict, numbers, NSData) otherwise the date will not be recoverable from the saved file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="customParameters">
+<tt class="descname">customParameters</tt><a class="headerlink" href="#customParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of custom parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsinstance">
+<h1><a class="reference internal" href="#GSInstance" title="GSInstance"><tt class="xref py py-mod docutils literal"><span class="pre">GSInstance</span></tt></a><a class="headerlink" href="#gsinstance" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the instance object. This corresponds more or less with the &#8220;Instances&#8221; pane in the Font Info.</p>
+<dl class="class">
+<dt id="GSInstance">
+<em class="property">class </em><tt class="descname">GSInstance</tt><a class="headerlink" href="#GSInstance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#active" title="active"><tt class="xref py py-obj docutils literal"><span class="pre">active</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#name" title="name"><tt class="xref py py-obj docutils literal"><span class="pre">name</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#weight" title="weight"><tt class="xref py py-obj docutils literal"><span class="pre">weight</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#width" title="width"><tt class="xref py py-obj docutils literal"><span class="pre">width</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#weightValue" title="weightValue"><tt class="xref py py-obj docutils literal"><span class="pre">weightValue</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#widthValue" title="widthValue"><tt class="xref py py-obj docutils literal"><span class="pre">widthValue</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#isItalic" title="isItalic"><tt class="xref py py-obj docutils literal"><span class="pre">isItalic</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#isBold" title="isBold"><tt class="xref py py-obj docutils literal"><span class="pre">isBold</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#linkStyle" title="linkStyle"><tt class="xref py py-obj docutils literal"><span class="pre">linkStyle</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#customParameters" title="customParameters"><tt class="xref py py-obj docutils literal"><span class="pre">customParameters</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id2">
+<h2>Properties<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="active">
+<tt class="descname">active</tt><a class="headerlink" href="#active" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">name</tt></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">weight</tt></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">width</tt></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">weightValue</tt></dt>
+<dd><p>Values for interpolation in design space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">widthValue</tt></dt>
+<dd><p>Values for interpolation in design space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="isItalic">
+<tt class="descname">isItalic</tt><a class="headerlink" href="#isItalic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Italic flag for style linking</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="isBold">
+<tt class="descname">isBold</tt><a class="headerlink" href="#isBold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bold flag for style linking</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="linkStyle">
+<tt class="descname">linkStyle</tt><a class="headerlink" href="#linkStyle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linked style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">customParameters</tt></dt>
+<dd><p>A dictionary of custom parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsclass">
+<h1><a class="reference internal" href="#GSClass" title="GSClass"><tt class="xref py py-mod docutils literal"><span class="pre">GSClass</span></tt></a><a class="headerlink" href="#gsclass" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the class object. It is used to implement OpenType classes in the font infos</p>
+<dl class="class">
+<dt id="GSClass">
+<em class="property">class </em><tt class="descname">GSClass</tt><a class="headerlink" href="#GSClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Properties</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#name" title="name"><tt class="xref py py-obj docutils literal"><span class="pre">name</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#code" title="code"><tt class="xref py py-obj docutils literal"><span class="pre">code</span></tt></a></td>
+<td>Utilities needed to emulate Python&#8217;s interactive interpreter.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#automatic" title="automatic"><tt class="xref py py-obj docutils literal"><span class="pre">automatic</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id3">
+<h2>Properties<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt>
+<tt class="descname">name</tt></dt>
+<dd><p>The Class name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="code">
+<tt class="descname">code</tt><a class="headerlink" href="#code" title="Permalink to this definition">¶</a></dt>
+<dd><p>A String with space seperated glyph names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="automatic">
+<tt class="descname">automatic</tt><a class="headerlink" href="#automatic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto-generate this class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsfeature">
+<h1><a class="reference internal" href="#GSFeature" title="GSFeature"><tt class="xref py py-mod docutils literal"><span class="pre">GSFeature</span></tt></a><a class="headerlink" href="#gsfeature" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the feature object. It is used to implement OpenType Features in the Font Info.</p>
+<dl class="class">
+<dt id="GSFeature">
+<em class="property">class </em><tt class="descname">GSFeature</tt><big>(</big><span class="optional">[</span><em>tag</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#GSFeature" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tag</strong> &#8211; The feature name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>Properties</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#name" title="name"><tt class="xref py py-obj docutils literal"><span class="pre">name</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#code" title="code"><tt class="xref py py-obj docutils literal"><span class="pre">code</span></tt></a></td>
+<td>Utilities needed to emulate Python&#8217;s interactive interpreter.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#automatic" title="automatic"><tt class="xref py py-obj docutils literal"><span class="pre">automatic</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Functions</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#update" title="update"><tt class="xref py py-obj docutils literal"><span class="pre">update</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id4">
+<h2>Properties<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt>
+<tt class="descname">name</tt></dt>
+<dd><p>The feature name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">code</tt></dt>
+<dd><p>The Feature code in Adobe FDK syntax.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">automatic</tt></dt>
+<dd><p>Auto-generate this feature</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id5">
+<h2>Functions<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="update">
+<tt class="descname">update</tt><big>(</big><big>)</big><a class="headerlink" href="#update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls the automatic feature code generator for this feature.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsglyph">
+<h1><a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-mod docutils literal"><span class="pre">GSGlyph</span></tt></a><a class="headerlink" href="#gsglyph" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the glyph object</p>
+<dl class="class">
+<dt id="GSGlyph">
+<em class="property">class </em><tt class="descname">GSGlyph</tt><big>(</big><span class="optional">[</span><em>name</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#GSGlyph" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; The glyph name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parent" title="parent"><tt class="xref py py-obj docutils literal"><span class="pre">parent</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#layers" title="layers"><tt class="xref py py-obj docutils literal"><span class="pre">layers</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#name" title="name"><tt class="xref py py-obj docutils literal"><span class="pre">name</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#unicode" title="unicode"><tt class="xref py py-obj docutils literal"><span class="pre">unicode</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#id" title="id"><tt class="xref py py-obj docutils literal"><span class="pre">id</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#category" title="category"><tt class="xref py py-obj docutils literal"><span class="pre">category</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#subCategory" title="subCategory"><tt class="xref py py-obj docutils literal"><span class="pre">subCategory</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#script" title="script"><tt class="xref py py-obj docutils literal"><span class="pre">script</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#leftKerningGroup" title="leftKerningGroup"><tt class="xref py py-obj docutils literal"><span class="pre">leftKerningGroup</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rightKerningGroup" title="rightKerningGroup"><tt class="xref py py-obj docutils literal"><span class="pre">rightKerningGroup</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#leftMetricsKey" title="leftMetricsKey"><tt class="xref py py-obj docutils literal"><span class="pre">leftMetricsKey</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#rightMetricsKey" title="rightMetricsKey"><tt class="xref py py-obj docutils literal"><span class="pre">rightMetricsKey</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#export" title="export"><tt class="xref py py-obj docutils literal"><span class="pre">export</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#color" title="color"><tt class="xref py py-obj docutils literal"><span class="pre">color</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#note" title="note"><tt class="xref py py-obj docutils literal"><span class="pre">note</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id6">
+<h2>Properties<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="parent">
+<tt class="descname">parent</tt><a class="headerlink" href="#parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference to the <a class="reference internal" href="#GSFont" title="GSFont"><tt class="xref py py-class docutils literal"><span class="pre">Font</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">GSFont</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="layers">
+<tt class="descname">layers</tt><a class="headerlink" href="#layers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The layers of the glyph, collection of <a class="reference internal" href="#GSLayer" title="GSLayer"><tt class="xref py py-class docutils literal"><span class="pre">GSLayer</span></tt></a> objects. You can access them either by index or by <a class="reference internal" href="#GSFontMaster" title="GSFontMaster"><tt class="xref py py-class docutils literal"><span class="pre">GSFontMaster</span></tt></a>.id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list, dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">name</tt></dt>
+<dd><p>The name of the glyph. It will be converted to a &#8220;nice name&#8221; (afii10017 to A-cy) (you can disable this behavior in font info or the app preference)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="unicode">
+<tt class="descname">unicode</tt><a class="headerlink" href="#unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>It will be automatically set; Read only.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">id</tt></dt>
+<dd><p>An unique identifierer for each glyph</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="category">
+<tt class="descname">category</tt><a class="headerlink" href="#category" title="Permalink to this definition">¶</a></dt>
+<dd><p>The category of the glyph. e.g. &#8216;Letter&#8217;, &#8216;Symbol&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subCategory">
+<tt class="descname">subCategory</tt><a class="headerlink" href="#subCategory" title="Permalink to this definition">¶</a></dt>
+<dd><p>The subCategory of the glyph. e.g. &#8216;Uppercase&#8217;, &#8216;Math&#8217;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="script">
+<tt class="descname">script</tt><a class="headerlink" href="#script" title="Permalink to this definition">¶</a></dt>
+<dd><p>The script of the glyph, e.g. &#8216;Latin&#8217;, &#8216;Arabic&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="leftKerningGroup">
+<tt class="descname">leftKerningGroup</tt><a class="headerlink" href="#leftKerningGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>The leftKerningGroup of the glyph. All glyphs with the same text in the kerning group end up in the same kerning class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rightKerningGroup">
+<tt class="descname">rightKerningGroup</tt><a class="headerlink" href="#rightKerningGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>The rightKerningGroup of the glyph. All glyphs with the same text in the kerning group end up in the same kerning class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="leftMetricsKey">
+<tt class="descname">leftMetricsKey</tt><a class="headerlink" href="#leftMetricsKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>The leftMetricsKey of the glyph. This is a reference to another glyph by name. It is used to synchronize the metrics with the linked glyph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rightMetricsKey">
+<tt class="descname">rightMetricsKey</tt><a class="headerlink" href="#rightMetricsKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>The rightMetricsKey of the glyph. This is a reference to another glyph by name. It is used to synchronize the metrics with the linked glyph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="export">
+<tt class="descname">export</tt><a class="headerlink" href="#export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Glyphs should export upon font generation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="color">
+<tt class="descname">color</tt><a class="headerlink" href="#color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Color marking of glyph in UI</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">note</tt></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gslayer">
+<h1><a class="reference internal" href="#GSLayer" title="GSLayer"><tt class="xref py py-mod docutils literal"><span class="pre">GSLayer</span></tt></a><a class="headerlink" href="#gslayer" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the layer object</p>
+<dl class="class">
+<dt id="GSLayer">
+<em class="property">class </em><tt class="descname">GSLayer</tt><a class="headerlink" href="#GSLayer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>Properties</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parent" title="parent"><tt class="xref py py-obj docutils literal"><span class="pre">parent</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#name" title="name"><tt class="xref py py-obj docutils literal"><span class="pre">name</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#associatedMasterId" title="associatedMasterId"><tt class="xref py py-obj docutils literal"><span class="pre">associatedMasterId</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#layerId" title="layerId"><tt class="xref py py-obj docutils literal"><span class="pre">layerId</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#components" title="components"><tt class="xref py py-obj docutils literal"><span class="pre">components</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#guideLines" title="guideLines"><tt class="xref py py-obj docutils literal"><span class="pre">guideLines</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#hints" title="hints"><tt class="xref py py-obj docutils literal"><span class="pre">hints</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#anchors" title="anchors"><tt class="xref py py-obj docutils literal"><span class="pre">anchors</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#paths" title="paths"><tt class="xref py py-obj docutils literal"><span class="pre">paths</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#LSB" title="LSB"><tt class="xref py py-obj docutils literal"><span class="pre">LSB</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#RSB" title="RSB"><tt class="xref py py-obj docutils literal"><span class="pre">RSB</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#width" title="width"><tt class="xref py py-obj docutils literal"><span class="pre">width</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#decomposeComponents" title="decomposeComponents"><tt class="xref py py-obj docutils literal"><span class="pre">decomposeComponents</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#compareString" title="compareString"><tt class="xref py py-obj docutils literal"><span class="pre">compareString</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#connectAllOpenPaths" title="connectAllOpenPaths"><tt class="xref py py-obj docutils literal"><span class="pre">connectAllOpenPaths</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#copyDecomposedLayer" title="copyDecomposedLayer"><tt class="xref py py-obj docutils literal"><span class="pre">copyDecomposedLayer</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#syncMetrics" title="syncMetrics"><tt class="xref py py-obj docutils literal"><span class="pre">syncMetrics</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#correctPathDirection" title="correctPathDirection"><tt class="xref py py-obj docutils literal"><span class="pre">correctPathDirection</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id7">
+<h2>Properties<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt>
+<tt class="descname">parent</tt></dt>
+<dd><p>Reference to the <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">Glyph</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">GSGlyph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">name</tt></dt>
+<dd><p>Name of layer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="associatedMasterId">
+<tt class="descname">associatedMasterId</tt><a class="headerlink" href="#associatedMasterId" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ID of the <a class="reference internal" href="#GSFontMaster" title="GSFontMaster"><tt class="xref py py-class docutils literal"><span class="pre">FontMaster</span></tt></a> this layer belongs to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="layerId">
+<tt class="descname">layerId</tt><a class="headerlink" href="#layerId" title="Permalink to this definition">¶</a></dt>
+<dd><p>The layer key is used to access the layer in the <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">glyphs</span></tt></a> layer dictionary.</p>
+<p>For master layers this should be the id of the <a class="reference internal" href="#GSFontMaster" title="GSFontMaster"><tt class="xref py py-class docutils literal"><span class="pre">FontMaster</span></tt></a>.
+It could look like this: &#8220;FBCA074D-FCF3-427E-A700-7E318A949AE5&#8221;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="components">
+<tt class="descname">components</tt><a class="headerlink" href="#components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of <a class="reference internal" href="#GSComponent" title="GSComponent"><tt class="xref py py-class docutils literal"><span class="pre">GSComponent</span></tt></a> objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">guideLines</tt></dt>
+<dd><p>List of <a class="reference internal" href="#GSGuideLine" title="GSGuideLine"><tt class="xref py py-class docutils literal"><span class="pre">GSGuideLine</span></tt></a> objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hints">
+<tt class="descname">hints</tt><a class="headerlink" href="#hints" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of <a class="reference internal" href="#GSHint" title="GSHint"><tt class="xref py py-class docutils literal"><span class="pre">GSHint</span></tt></a> objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="anchors">
+<tt class="descname">anchors</tt><a class="headerlink" href="#anchors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of <tt class="xref py py-class docutils literal"><span class="pre">GSAnchor</span></tt> objects. The name of the anchor is the key, the <tt class="xref py py-class docutils literal"><span class="pre">GSAnchor</span></tt> is the value.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">anchor</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">anchors</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">name</span><span class="p">,</span> <span class="n">anchor</span>
+<span class="n">ogonek</span> <span class="o">&lt;</span><span class="n">GSAnchor</span> <span class="s">&quot;ogonek&quot;</span> <span class="n">x</span><span class="o">=</span><span class="mf">630.0</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.0</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="paths">
+<tt class="descname">paths</tt><a class="headerlink" href="#paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of <a class="reference internal" href="#GSPath" title="GSPath"><tt class="xref py py-class docutils literal"><span class="pre">GSPath</span></tt></a> objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="LSB">
+<tt class="descname">LSB</tt><a class="headerlink" href="#LSB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Left side bearing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="RSB">
+<tt class="descname">RSB</tt><a class="headerlink" href="#RSB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Right side bearing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">width</tt></dt>
+<dd><p>Glyph width</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id8">
+<h2>Functions<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="decomposeComponents">
+<tt class="descname">decomposeComponents</tt><big>(</big><big>)</big><a class="headerlink" href="#decomposeComponents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decomposes all components of the layer at once.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="compareString">
+<tt class="descname">compareString</tt><big>(</big><big>)</big><a class="headerlink" href="#compareString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string representing the outline structure of the glyph, for compatibility comparison.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The comparison string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="connectAllOpenPaths">
+<tt class="descname">connectAllOpenPaths</tt><big>(</big><big>)</big><a class="headerlink" href="#connectAllOpenPaths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes all open paths when end points are further than 1 unit away from each other.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="copyDecomposedLayer">
+<tt class="descname">copyDecomposedLayer</tt><big>(</big><big>)</big><a class="headerlink" href="#copyDecomposedLayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of the layer with all components already decomposed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A new layer object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#GSLayer" title="GSLayer"><tt class="xref py py-class docutils literal"><span class="pre">GSLayer</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="syncMetrics">
+<tt class="descname">syncMetrics</tt><big>(</big><big>)</big><a class="headerlink" href="#syncMetrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take over LSB and RSB from linked glyph.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="correctPathDirection">
+<tt class="descname">correctPathDirection</tt><big>(</big><big>)</big><a class="headerlink" href="#correctPathDirection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corrects the path direction.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsanchor">
+<h1><tt class="xref py py-mod docutils literal"><span class="pre">GSAnchor</span></tt><a class="headerlink" href="#gsanchor" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the anchor object.</p>
+<dl class="class">
+<dt id="Anchor">
+<em class="property">class </em><tt class="descname">Anchor</tt><big>(</big><span class="optional">[</span><em>name</em>, <em>pt</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#Anchor" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; the name of the anchor</li>
+<li><strong>pt</strong> &#8211; the position of the anchor</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#position" title="position"><tt class="xref py py-obj docutils literal"><span class="pre">position</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#name" title="name"><tt class="xref py py-obj docutils literal"><span class="pre">name</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id9">
+<h2>Properties<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="position">
+<tt class="descname">position</tt><a class="headerlink" href="#position" title="Permalink to this definition">¶</a></dt>
+<dd><p>The position of the anchor</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSPoint</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">name</tt></dt>
+<dd><p>The name of the anchor</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gscomponent">
+<h1><a class="reference internal" href="#GSComponent" title="GSComponent"><tt class="xref py py-mod docutils literal"><span class="pre">GSComponent</span></tt></a><a class="headerlink" href="#gscomponent" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="GSComponent">
+<em class="property">class </em><tt class="descname">GSComponent</tt><big>(</big><em>glyph</em><span class="optional">[</span>, <em>pt</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#GSComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the component object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>glyph</strong> &#8211; a glyph object or the glyph name</li>
+<li><strong>pt</strong> &#8211; the position of the component</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p><strong>Properties</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#position" title="position"><tt class="xref py py-obj docutils literal"><span class="pre">position</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#componentName" title="componentName"><tt class="xref py py-obj docutils literal"><span class="pre">componentName</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#component" title="component"><tt class="xref py py-obj docutils literal"><span class="pre">component</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#transform" title="transform"><tt class="xref py py-obj docutils literal"><span class="pre">transform</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#bounds" title="bounds"><tt class="xref py py-obj docutils literal"><span class="pre">bounds</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#decompose" title="decompose"><tt class="xref py py-obj docutils literal"><span class="pre">decompose</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id10">
+<h2>Properties<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt>
+<tt class="descname">position</tt></dt>
+<dd><p>The Position of the component.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSPoint</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="componentName">
+<tt class="descname">componentName</tt><a class="headerlink" href="#componentName" title="Permalink to this definition">¶</a></dt>
+<dd><p>The glyph name the component is pointing to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">unicode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="component">
+<tt class="descname">component</tt><a class="headerlink" href="#component" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">GSGlyph</span></tt></a> the component is pointing to. This is read only. Set the componentName to the glyph name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body"><a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">GSGlyph</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="transform">
+<tt class="descname">transform</tt><a class="headerlink" href="#transform" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSAffineTransformStruct</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bounds">
+<tt class="descname">bounds</tt><a class="headerlink" href="#bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bounding box of the component, read only</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSRect</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id11">
+<h2>Functions<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="decompose">
+<tt class="descname">decompose</tt><big>(</big><big>)</big><a class="headerlink" href="#decompose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decomposes the component</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gspath">
+<h1><a class="reference internal" href="#GSPath" title="GSPath"><tt class="xref py py-mod docutils literal"><span class="pre">GSPath</span></tt></a><a class="headerlink" href="#gspath" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the path object.</p>
+<dl class="class">
+<dt id="GSPath">
+<em class="property">class </em><tt class="descname">GSPath</tt><a class="headerlink" href="#GSPath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>Properties</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parent" title="parent"><tt class="xref py py-obj docutils literal"><span class="pre">parent</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nodes" title="nodes"><tt class="xref py py-obj docutils literal"><span class="pre">nodes</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#segments" title="segments"><tt class="xref py py-obj docutils literal"><span class="pre">segments</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#closed" title="closed"><tt class="xref py py-obj docutils literal"><span class="pre">closed</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#direction" title="direction"><tt class="xref py py-obj docutils literal"><span class="pre">direction</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#bounds" title="bounds"><tt class="xref py py-obj docutils literal"><span class="pre">bounds</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Functions</strong></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#reverse" title="reverse"><tt class="xref py py-obj docutils literal"><span class="pre">reverse</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id12">
+<h2>Properties<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt>
+<tt class="descname">parent</tt></dt>
+<dd><p>Reference to the <a class="reference internal" href="#GSGlyph" title="GSGlyph"><tt class="xref py py-class docutils literal"><span class="pre">Glyph</span></tt></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">GSGlyph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="nodes">
+<tt class="descname">nodes</tt><a class="headerlink" href="#nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of <a class="reference internal" href="#GSNode" title="GSNode"><tt class="xref py py-class docutils literal"><span class="pre">GSNode</span></tt></a> objects</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="segments">
+<tt class="descname">segments</tt><a class="headerlink" href="#segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of segments as NSPoint objects. Two objects represent a line, four represent a courve. Start point of the segment is included.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="closed">
+<tt class="descname">closed</tt><a class="headerlink" href="#closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returnes True if the the path is closed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="direction">
+<tt class="descname">direction</tt><a class="headerlink" href="#direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path direction. -1 for counter clockwise, 1 for clockwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">bounds</tt></dt>
+<dd><p>Bounding box of the component, read only</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSRect</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id13">
+<h2>Functions<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reverses the path direction</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsnode">
+<h1><a class="reference internal" href="#GSNode" title="GSNode"><tt class="xref py py-mod docutils literal"><span class="pre">GSNode</span></tt></a><a class="headerlink" href="#gsnode" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the node object.</p>
+<dl class="class">
+<dt id="GSNode">
+<em class="property">class </em><tt class="descname">GSNode</tt><big>(</big><span class="optional">[</span><em>pt</em>, <em>type</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#GSNode" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pt</strong> &#8211; The position of the node.</li>
+<li><strong>type</strong> &#8211; The type of the node, GSLINE, GSCURVE or GSOFFCURVE</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#position" title="position"><tt class="xref py py-obj docutils literal"><span class="pre">position</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#type" title="type"><tt class="xref py py-obj docutils literal"><span class="pre">type</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#connection" title="connection"><tt class="xref py py-obj docutils literal"><span class="pre">connection</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id14">
+<h2>Properties<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt>
+<tt class="descname">position</tt></dt>
+<dd><p>The position of the node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSPoint</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="type">
+<tt class="descname">type</tt><a class="headerlink" href="#type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of the node, GSLINE, GSCURVE or GSOFFCURVE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="connection">
+<tt class="descname">connection</tt><a class="headerlink" href="#connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of the connection, GSSHARP or GSSMOOTH</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gsguideline">
+<h1><a class="reference internal" href="#GSGuideLine" title="GSGuideLine"><tt class="xref py py-mod docutils literal"><span class="pre">GSGuideLine</span></tt></a><a class="headerlink" href="#gsguideline" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the guide line object.</p>
+<dl class="class">
+<dt id="GSGuideLine">
+<em class="property">class </em><tt class="descname">GSGuideLine</tt><a class="headerlink" href="#GSGuideLine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#position" title="position"><tt class="xref py py-obj docutils literal"><span class="pre">position</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#angle" title="angle"><tt class="xref py py-obj docutils literal"><span class="pre">angle</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id15">
+<h2>Properties<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt>
+<tt class="descname">position</tt></dt>
+<dd><p>The position of the node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">NSPoint</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="angle">
+<tt class="descname">angle</tt><a class="headerlink" href="#angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Angle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gshint">
+<h1><a class="reference internal" href="#GSHint" title="GSHint"><tt class="xref py py-mod docutils literal"><span class="pre">GSHint</span></tt></a><a class="headerlink" href="#gshint" title="Permalink to this headline">¶</a></h1>
+<p>Implementation of the hint object.</p>
+<dl class="class">
+<dt id="GSHint">
+<em class="property">class </em><tt class="descname">GSHint</tt><a class="headerlink" href="#GSHint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#originNode" title="originNode"><tt class="xref py py-obj docutils literal"><span class="pre">originNode</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#targetNode" title="targetNode"><tt class="xref py py-obj docutils literal"><span class="pre">targetNode</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#ghost" title="ghost"><tt class="xref py py-obj docutils literal"><span class="pre">ghost</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#horizontal" title="horizontal"><tt class="xref py py-obj docutils literal"><span class="pre">horizontal</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id16">
+<h2>Properties<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="originNode">
+<tt class="descname">originNode</tt><a class="headerlink" href="#originNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>The the first node this hint is attached to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">GSNode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="targetNode">
+<tt class="descname">targetNode</tt><a class="headerlink" href="#targetNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>The the second node this hint is attached to. In case of a ghost hint this value will be empty.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">GSNode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ghost">
+<tt class="descname">ghost</tt><a class="headerlink" href="#ghost" title="Permalink to this definition">¶</a></dt>
+<dd><p>-1 for a top ghost hint, 1 for a bottom ghost hint or 0 if it&#8217;s not a ghost hint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="horizontal">
+<tt class="descname">horizontal</tt><a class="headerlink" href="#horizontal" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if hint is horizontal, False if vertical.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type :</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="methods">
+<h1>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#niceName" title="niceName"><tt class="xref py py-obj docutils literal"><span class="pre">niceName()</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#divideCurve" title="divideCurve"><tt class="xref py py-obj docutils literal"><span class="pre">divideCurve()</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#distance" title="distance"><tt class="xref py py-obj docutils literal"><span class="pre">distance()</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#addPoints" title="addPoints"><tt class="xref py py-obj docutils literal"><span class="pre">addPoints()</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#substractPoints" title="substractPoints"><tt class="xref py py-obj docutils literal"><span class="pre">substractPoints()</span></tt></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#GetFile" title="GetFile"><tt class="xref py py-obj docutils literal"><span class="pre">GetFile()</span></tt></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="niceName">
+<tt class="descname">niceName</tt><big>(</big><em>Name</em><big>)</big><a class="headerlink" href="#niceName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the Name in a readable name. (converts &#8220;uni01D1&#8221; in &#8220;Ocaron&#8221;)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Name</strong> &#8211; A glyph name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The converted Name.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="divideCurve">
+<tt class="descname">divideCurve</tt><big>(</big><em>P0</em>, <em>P1</em>, <em>P2</em>, <em>P3</em>, <em>t</em><big>)</big><a class="headerlink" href="#divideCurve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides the curve using the De Casteljau&#8217;s algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>P0</strong> &#8211; The Start point of the Curve (NSPoint)</li>
+<li><strong>P1</strong> &#8211; The first off curve point</li>
+<li><strong>P2</strong> &#8211; The second off curve point</li>
+<li><strong>P3</strong> &#8211; The End point of the Curve</li>
+<li><strong>t</strong> &#8211; The time paramter</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of points that represent two curves. (Q0, Q1, Q2, Q3, R1, R2, R3). Note that the &#8220;middle&#8221; point is only returned once.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="distance">
+<tt class="descname">distance</tt><big>(</big><em>P0</em>, <em>P1</em><big>)</big><a class="headerlink" href="#distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates the distance between two NSPoints</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>P0</strong> &#8211; a NSPoint</li>
+<li><strong>P1</strong> &#8211; another NSPoint</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="addPoints">
+<tt class="descname">addPoints</tt><big>(</big><em>P1</em>, <em>P2</em><big>)</big><a class="headerlink" href="#addPoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the points.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>P0</strong> &#8211; a NSPoint</li>
+<li><strong>P1</strong> &#8211; another NSPoint</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The sum of both points</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NSPoint</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="substractPoints">
+<tt class="descname">substractPoints</tt><big>(</big><em>P1</em>, <em>P2</em><big>)</big><a class="headerlink" href="#substractPoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtracts the points.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>P0</strong> &#8211; a NSPoint</li>
+<li><strong>P1</strong> &#8211; another NSPoint</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The substractzed point</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NSPoint</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="scalePoint">
+<tt class="descname">scalePoint</tt><big>(</big><em>P</em>, <em>scalar</em><big>)</big><a class="headerlink" href="#scalePoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scaled a point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>P</strong> &#8211; a NSPoint</li>
+<li><strong>scalar</strong> &#8211; The Multiplier</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The multiplied point</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NSPoint</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="GetFile">
+<tt class="descname">GetFile</tt><big>(</big><em>message=None</em>, <em>filetypes = None</em>, <em>selectFolders = True</em>, <em>selectFiles = True</em><big>)</big><a class="headerlink" href="#GetFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens a file chooser dialog.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>message</strong> &#8211; </li>
+<li><strong>filestypes</strong> &#8211; </li>
+<li><strong>selectFolders</strong> &#8211; </li>
+<li><strong>selectFiles</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The selected file or None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unicode</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="GetFolder">
+<tt class="descname">GetFolder</tt><big>(</big><em>message=None</em>, <em>allowsMultipleSelection = False</em><big>)</big><a class="headerlink" href="#GetFolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens a folder chooser dialog.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>message</strong> &#8211; </li>
+<li><strong>allowsMultipleSelection</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The selected folder or None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unicode</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Glyphs.app Python Scripting API Documentation</a></li>
+<li><a class="reference internal" href="#constants">Constants</a></li>
+<li><a class="reference internal" href="#gsfont"><tt class="docutils literal"><span class="pre">GSFont</span></tt></a><ul>
+<li><a class="reference internal" href="#properties">Properties</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsfontmaster"><tt class="docutils literal"><span class="pre">GSFontMaster</span></tt></a><ul>
+<li><a class="reference internal" href="#id1">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsinstance"><tt class="docutils literal"><span class="pre">GSInstance</span></tt></a><ul>
+<li><a class="reference internal" href="#id2">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsclass"><tt class="docutils literal"><span class="pre">GSClass</span></tt></a><ul>
+<li><a class="reference internal" href="#id3">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsfeature"><tt class="docutils literal"><span class="pre">GSFeature</span></tt></a><ul>
+<li><a class="reference internal" href="#id4">Properties</a></li>
+<li><a class="reference internal" href="#id5">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsglyph"><tt class="docutils literal"><span class="pre">GSGlyph</span></tt></a><ul>
+<li><a class="reference internal" href="#id6">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gslayer"><tt class="docutils literal"><span class="pre">GSLayer</span></tt></a><ul>
+<li><a class="reference internal" href="#id7">Properties</a></li>
+<li><a class="reference internal" href="#id8">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsanchor"><tt class="docutils literal"><span class="pre">GSAnchor</span></tt></a><ul>
+<li><a class="reference internal" href="#id9">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gscomponent"><tt class="docutils literal"><span class="pre">GSComponent</span></tt></a><ul>
+<li><a class="reference internal" href="#id10">Properties</a></li>
+<li><a class="reference internal" href="#id11">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gspath"><tt class="docutils literal"><span class="pre">GSPath</span></tt></a><ul>
+<li><a class="reference internal" href="#id12">Properties</a></li>
+<li><a class="reference internal" href="#id13">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsnode"><tt class="docutils literal"><span class="pre">GSNode</span></tt></a><ul>
+<li><a class="reference internal" href="#id14">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gsguideline"><tt class="docutils literal"><span class="pre">GSGuideLine</span></tt></a><ul>
+<li><a class="reference internal" href="#id15">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gshint"><tt class="docutils literal"><span class="pre">GSHint</span></tt></a><ul>
+<li><a class="reference internal" href="#id16">Properties</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#methods">Methods</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">Glyphs.app Python Scripting API 0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Georg Seifert.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
